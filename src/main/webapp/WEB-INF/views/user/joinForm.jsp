@@ -3,8 +3,9 @@
 
 <%@ include file="../layout/header.jsp"%>
 
-<div class="container p-4 w-25 bg-light rounded shadow" >
-<h5 style="font-family: 'IBM Plex Sans KR', sans-serif;  margin-bottom:30px;" >회원가입</h5>
+<div class="container p-4 w-25 bg-light rounded shadow">
+	<h5
+		style="font-family: 'IBM Plex Sans KR', sans-serif; margin-bottom: 30px;">회원가입</h5>
 	<form action="/join" method="post">
 		<div class="form-group">
 			<input type="text" name="username" class="form-control"
@@ -18,7 +19,8 @@
 			<input type="email" class="form-control" name="email"
 				placeholder="Enter email" required="required">
 		</div>
-		<button type="submit" class="btn btn-primary col-md-4" style=" margin-top:30px;">회원가입</button>
+		<button type="submit" class="btn btn-primary col-md-4"
+			style="margin-top: 30px;">회원가입</button>
 	</form>
 </div>
 

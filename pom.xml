@@ -18,6 +18,7 @@
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
+	
 	<!-- pring-boot-starter-data-jpa -->
 	<dependency>
 			<groupId>org.springframework.boot</groupId>
