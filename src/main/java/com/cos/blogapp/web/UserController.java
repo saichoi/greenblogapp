@@ -6,16 +6,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.domain.user.UserRepository;
 import com.cos.blogapp.web.dto.JoinReqDto;
+import com.cos.blogapp.web.dto.LoginReqDto;
 
 @Controller
 public class UserController {
 
 	private UserRepository userRepository;
-	private HttpSession session; // dependecy injection
+	private HttpSession session;
 
-	public UserController(UserRepository userRepository, HttpSession session) { // IoC컨테이너에서 찾아서 주입한다.
+	public UserController(UserRepository userRepository, HttpSession session) {
 		this.userRepository = userRepository;
 		this.session = session;
 	}
@@ -42,5 +44,23 @@ public class UserController {
 
 		return "redirect:/loginForm"; 
 	}
+	
+	@PostMapping("/login")
+	public String login(LoginReqDto dto) {
+
+		System.out.println(dto.getUsername());
+		System.out.println(dto.getPassword());
+		
+		User userEntity = userRepository.mLogin(dto.getUsername(), dto.getPassword());
+		
+		if(userEntity == null) {
+			return "redirect:/loginForm";
+		}else {
+			session.setAttribute("principal", userEntity); 
+			return "redirect:/home";
+		}
+		
+	}
+	
 
 }

@@ -16,10 +16,11 @@ public class JoinReqDto {
 	
 	public User toEntity() {
 		User user = new User();
-		//user.setId(1); 원래는 입력받지 않는 데이터를 입력하면 update문이 실행 
-		user.setUesrname(username);
+
+		user.setUsername(username);
 		user.setPassword(password);
 		user.setEmail(email);
+		
 		return user;
 	}
 }
