@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h1>잘몬된 접근입니다.</h1>
+<h1>에러 터졌어요!!</h1>
+${errorMap}
 </body>
 </html>

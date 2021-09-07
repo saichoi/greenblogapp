@@ -1,8 +1,15 @@
 package com.cos.blogapp.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -36,24 +43,37 @@ public class UserController {
 	}
 
 	@PostMapping("/join")
-	public String join(JoinReqDto dto) {
+	public String join(@Valid JoinReqDto dto, BindingResult bindingResult, Model model) {
+																																			// 모델 : 의존성주입하게 만들어준다. 
+		System.out.println("에러사이즈" + bindingResult.getFieldErrors().size());
 		
-		if(dto.getPassword() == null ||
-				dto.getPassword() == null ||
-				dto.getEmail() == null ||
-				!dto.getUsername().equals("") ||	 
-				!dto.getPassword().equals("") || 
-				!dto.getEmail().equals("")
-		){
-			return "error/error"; //controller는 페이지 리턴할 수 없다. -> 에러페이지 만들어준다. 
+		if(bindingResult.hasErrors()) {
+			Map<String, String> errorMap = new HashMap<>();
+			for(FieldError error : bindingResult.getFieldErrors()) {
+				errorMap.put(error.getField(), error.getDefaultMessage());
+				System.out.println("필드 : " +  error.getField());
+				System.out.println("메시지 : " +  error.getDefaultMessage());
+			}
+			model.addAttribute("errorMap" ,errorMap);
+			return "error/error";
 		}
+		
 		userRepository.save(dto.toEntity());
 		return "redirect:/loginForm"; 
 	}
 	
 	@PostMapping("/login")
-	public String login(LoginReqDto dto) {
-
+	public String login(@Valid LoginReqDto dto, BindingResult bindingResult, Model model) {
+		
+		if(bindingResult.hasErrors()) {
+			Map<String, String> errorMap = new HashMap<>();
+			for(FieldError error : bindingResult.getFieldErrors()) {
+				errorMap.put(error.getField(), error.getDefaultMessage());
+			}
+			model.addAttribute("errorMap",errorMap);
+			return "error/error";
+		}
+		
 		System.out.println(dto.getUsername());
 		System.out.println(dto.getPassword());
 		

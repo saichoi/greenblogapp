@@ -9,11 +9,11 @@
 	<form action="/join" method="post">
 		<div class="form-group">
 			<input type="text" name="username" class="form-control"
-				placeholder="Enter username" required="required">
+				placeholder="Enter username" required="required" maxlength="20">
 		</div>
 		<div class="form-group">
 			<input type="password" class="form-control" name="password"
-				placeholder="Enter password" required="required">
+				placeholder="Enter password" required="required" maxlength="20">
 		</div>
 		<div class="form-group">
 			<input type="email" class="form-control" name="email"
