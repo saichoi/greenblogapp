@@ -1,5 +1,6 @@
 package com.cos.blogapp.domain.user;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,8 +18,11 @@ public class User {
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id; 
-	private String username; 
+	@Column(nullable = false, length = 20, unique = true) //무조건 username 받도록 만들기, 20byte(한글6자)로 제외, 중복 제한  
+	private String username;
+	@Column(nullable = false, length = 20)
 	private String password;
+	@Column(nullable = false, length = 50)
 	private String email;
 	
 }

@@ -11,18 +11,16 @@ import com.cos.blogapp.domain.user.UserRepository;
 import com.cos.blogapp.web.dto.JoinReqDto;
 import com.cos.blogapp.web.dto.LoginReqDto;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Controller
 public class UserController {
 
-	private UserRepository userRepository;
-	private HttpSession session;
+	private final UserRepository userRepository;
+	private final HttpSession session;
 
-	public UserController(UserRepository userRepository, HttpSession session) {
-		this.userRepository = userRepository;
-		this.session = session;
-	}
-
-	@GetMapping("/home")
+	@GetMapping({"/","home"}) // 두가지 루트 모두 메인화면으로 가게 만든다.
 	public String home() {
 		return "home";
 	}
@@ -39,9 +37,17 @@ public class UserController {
 
 	@PostMapping("/join")
 	public String join(JoinReqDto dto) {
-
+		
+		if(dto.getPassword() == null ||
+				dto.getPassword() == null ||
+				dto.getEmail() == null ||
+				!dto.getUsername().equals("") ||	 
+				!dto.getPassword().equals("") || 
+				!dto.getEmail().equals("")
+		){
+			return "error/error"; //controller는 페이지 리턴할 수 없다. -> 에러페이지 만들어준다. 
+		}
 		userRepository.save(dto.toEntity());
-
 		return "redirect:/loginForm"; 
 	}
 	

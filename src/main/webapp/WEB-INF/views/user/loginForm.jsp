@@ -9,11 +9,11 @@
 	<form action="/login" method="post">
 		<div class="form-group">
 			<input type="text" name="username" class="form-control"
-				placeholder="Enter username">
+				placeholder="Enter username" required="required">
 		</div>
 		<div class="form-group">
 			<input type="password" class="form-control" name="password"
-				placeholder="Enter password" id="pwd">
+				placeholder="Enter password" id="pwd" required="required">
 		</div>
 		<%-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> --%> 
 		<button type="submit" class="btn btn-primary col-md-4"
