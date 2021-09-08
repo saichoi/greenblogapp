@@ -17,7 +17,7 @@
 		</div>
 		<div class="form-group">
 			<input type="email" class="form-control" name="email"
-				placeholder="Enter email" required="required">
+				placeholder="Enter email">
 		</div>
 		<button type="submit" class="btn btn-primary col-md-4"
 			style="margin-top: 30px;">회원가입</button>

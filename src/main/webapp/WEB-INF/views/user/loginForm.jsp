@@ -13,7 +13,7 @@
 		</div>
 		<div class="form-group">
 			<input type="password" class="form-control" name="password"
-				placeholder="Enter password" id="pwd" required="required">
+				placeholder="Enter password" id="pwd" >
 		</div>
 		<%-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> --%> 
 		<button type="submit" class="btn btn-primary col-md-4"

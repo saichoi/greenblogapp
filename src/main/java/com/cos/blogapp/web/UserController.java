@@ -12,9 +12,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.domain.user.UserRepository;
+import com.cos.blogapp.util.Script;
 import com.cos.blogapp.web.dto.JoinReqDto;
 import com.cos.blogapp.web.dto.LoginReqDto;
 
@@ -43,10 +45,15 @@ public class UserController {
 	}
 
 	@PostMapping("/join")
-	public String join(@Valid JoinReqDto dto, BindingResult bindingResult, Model model) {
-																																			// 모델 : 의존성주입하게 만들어준다. 
-		System.out.println("에러사이즈" + bindingResult.getFieldErrors().size());
+	public @ResponseBody String join(@Valid JoinReqDto dto, BindingResult bindingResult, Model model) {
+																																			// 모델 : 의존성주입하게 만들어준다.
 		
+		//1.유효성 검사 실패 - 자바스크립트 응답(경고창띄우고 joinForm페이지 돌아가기(뒤로가기) )
+		//2.정상 - 로그인 페이지 
+		
+		//System.out.println("에러사이즈" + bindingResult.getFieldErrors().size());
+		
+		//실패했을 때
 		if(bindingResult.hasErrors()) {
 			Map<String, String> errorMap = new HashMap<>();
 			for(FieldError error : bindingResult.getFieldErrors()) {
@@ -55,35 +62,37 @@ public class UserController {
 				System.out.println("메시지 : " +  error.getDefaultMessage());
 			}
 			model.addAttribute("errorMap" ,errorMap);
-			return "error/error";
+			return Script.back(errorMap.toString());
 		}
 		
+		//정상일 때
 		userRepository.save(dto.toEntity());
-		return "redirect:/loginForm"; 
+		return Script.href("/loginForm");  
 	}
 	
 	@PostMapping("/login")
-	public String login(@Valid LoginReqDto dto, BindingResult bindingResult, Model model) {
+	public @ResponseBody String login(@Valid LoginReqDto dto, BindingResult bindingResult, Model model) {
 		
+		//1.유효성 검사 실패 - 자바스크립트 응답(경고창띄우고 loginForm페이지 돌아가기(뒤로가기) )
+		//2.정상 - 메인 페이지 
+		
+		//실패했을 때
 		if(bindingResult.hasErrors()) {
 			Map<String, String> errorMap = new HashMap<>();
 			for(FieldError error : bindingResult.getFieldErrors()) {
 				errorMap.put(error.getField(), error.getDefaultMessage());
 			}
-			model.addAttribute("errorMap",errorMap);
-			return "error/error";
+			model.addAttribute("errorMap", errorMap);
+			return Script.back(errorMap.toString());
 		}
-		
-		System.out.println(dto.getUsername());
-		System.out.println(dto.getPassword());
 		
 		User userEntity = userRepository.mLogin(dto.getUsername(), dto.getPassword());
 		
-		if(userEntity == null) {
-			return "redirect:/loginForm";
+		if(userEntity == null) { // username, password 잘못기입 
+			return Script.back("아이디 혹은 비밀번호를 잘못 입력하였습니다.");
 		}else {
 			session.setAttribute("principal", userEntity); 
-			return "redirect:/home";
+			return Script.href("/","로그인 성공");
 		}
 		
 	}
