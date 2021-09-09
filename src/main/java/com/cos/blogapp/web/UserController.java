@@ -26,13 +26,9 @@ import lombok.RequiredArgsConstructor;
 @Controller
 public class UserController {
 
+	//DI
 	private final UserRepository userRepository;
 	private final HttpSession session;
-
-	@GetMapping({"/","home"}) // 두가지 루트 모두 메인화면으로 가게 만든다.
-	public String home() {
-		return "home";
-	}
 
 	@GetMapping("/loginForm")
 	public String login() {
