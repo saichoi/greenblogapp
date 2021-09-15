@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -34,6 +35,18 @@ public class BoardController {
 	private final BoardRepository boardRepository;
 	private final HttpSession session;
 		//final 붙이면 초기화 해줘야한다.
+	
+	//queryString, pathVariable => DB where에 걸리는 친구들!!
+	//1.컨트롤러 선정 2.Http Method 선정 3.받을 데이터가 있는지!! (body, queryString, pathVariable)
+	//4.디비에 접근해야하면 Model 접근 orElse Model에 접근할 필요 없다.
+	@GetMapping("/board/{id}") //PathVariable 주소 방식
+	public String detail(@PathVariable int id, Model model) {
+		//select * from board where id = :id
+		Board boardEntity = boardRepository.findById(id).get();
+		model.addAttribute("boardEntity",boardEntity);
+		return "board/detail";
+	}
+	
 	@PostMapping("/board")
 	public @ResponseBody String save(@Valid BoardSaveReqDto dto, BindingResult bindingResult) {
 		
@@ -54,6 +67,9 @@ public class BoardController {
 		}
 		
 		System.out.println(dto.getTitle());
+		//<p><b>안녕</b></p>
+		dto.setContent(dto.getContent().replaceAll("p", ""));
+		dto.setTitle(dto.getTitle().replaceAll("p", ""));
 		System.out.println(dto.getContent());
 		
 //		User user = new User();
