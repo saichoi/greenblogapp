@@ -2,7 +2,6 @@ package com.cos.blogapp.web;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -51,13 +50,10 @@ public class BoardController {
 		
 		//2.orElseThrow
 		Board boardEntity = boardRepository.findById(id)
-				.orElseThrow(new Supplier<MyNotFountException>() { // {id}잘못 넣었다.
-					@Override
-					public MyNotFountException get() {
-						return new MyNotFountException(id+"를 찾을 수 없습니다.");
-					}
-				});
-		
+				.orElseThrow(()-> //람다식 사용할 때 : 함수 한개인지 확인->매개변수 있는지 확인->리턴필요한지 확인:<T>를 리턴 
+					new MyNotFountException(id+"를 못 찾았어요.") 
+					);   
+			//람다식에서 {}는 여러줄 코드를 사용하기 위해 사용 -> 한 줄이라면 중괄호 생략 -> 한줄 무조건 리턴 -> 리턴 생략 -> 세미콜론 지움   
 		model.addAttribute("boardEntity",boardEntity);
 		return "board/detail";
 	}
