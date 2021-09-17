@@ -58,6 +58,7 @@ public class BoardController {
 		return "board/detail";
 	}
 	
+	//RestFull API 주소 설계 방식 
 	@PostMapping("/board")
 	public @ResponseBody String save(@Valid BoardSaveReqDto dto, BindingResult bindingResult) {
 		
