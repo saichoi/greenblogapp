@@ -8,12 +8,21 @@
 	<button id="deleteBtn" class="btn btn-danger" onclick="deleteById(${boardEntity.id})">삭제</button>
 
 	<script>
-         	function deleteById(id){ // board.id 자바스크립트는 타입 필요 없다.
-         		// 비동기 함수 호출 -> 비동기 잘 처리하는 방법??????		
-         		fetch("http://localhost:8000/board/"+id, { // fetch : http 요청 함수 (axios, ajax...) 
+         	async function deleteById(id){ // board.id 자바스크립트는 타입 필요 없다.
+         		// 1.비동기 함수 호출 -> 비동기 잘 처리하는 방법??????		
+         		let response = await fetch("http://localhost:8000/board/"+id, { // fetch : http 요청 함수 (axios, ajax...) 
 									         		// http://localhost:8000 -> 생략가능
          			method : "DELETE"
-         		});  
+         		}); //약속 - 어음(0.5s)
+         		
+         		//2.코드
+         		let parseResoponse = await.resoponse.test();
+         		console.log(parseResponse);
+         		
+         		alert("삭제 성공");
+         		location.href="/";
+         		
+         		//3.코드
          	}
          	
          </script>
