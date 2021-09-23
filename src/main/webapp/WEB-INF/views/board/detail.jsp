@@ -16,7 +16,7 @@
          		}); //약속 - 어음(0.5s)
          		
          		//2.코드
-         		let parseResoponse = await.resoponse.test();
+         		let parseResponse = await response.text();
          		console.log(parseResponse);
          		
          		alert("삭제 성공");
