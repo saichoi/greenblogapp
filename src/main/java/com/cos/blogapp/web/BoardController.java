@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ import com.cos.blogapp.handler.ex.MyNotFountException;
 import com.cos.blogapp.util.Script;
 import com.cos.blogapp.web.dto.BoardSaveReqDto;
 
+import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor //final 붙은 필드에 대한 생성자를 만들어준다.
@@ -36,6 +38,13 @@ public class BoardController {
 	private final BoardRepository boardRepository;
 	private final HttpSession session;
 		//final 붙이면 초기화 해줘야한다.
+	
+	@DeleteMapping("/board/{id}")
+	public @ResponseBody String deleteById(@PathVariable int id) {
+		boardRepository.deleteById(id);
+		System.out.println("삭제됨"+id);
+		return "ok"; // @ResoponseBody : 데이터 리턴  
+	}
 	
 	//queryString, pathVariable => DB where에 걸리는 친구들!!
 	//1.컨트롤러 선정 2.Http Method 선정 3.받을 데이터가 있는지!! (body, queryString, pathVariable)
