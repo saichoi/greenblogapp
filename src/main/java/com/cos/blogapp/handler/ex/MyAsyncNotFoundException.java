@@ -7,9 +7,9 @@ package com.cos.blogapp.handler.ex;
  *
  */
 
-public class MyNotFountException extends RuntimeException{
+public class MyAsyncNotFoundException extends RuntimeException{
 	
-	public MyNotFountException(String msg) {
+	public MyAsyncNotFoundException(String msg) {
 		super(msg);
 	}
 	
