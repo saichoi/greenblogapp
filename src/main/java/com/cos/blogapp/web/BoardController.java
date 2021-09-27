@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cos.blogapp.domain.board.Board;
@@ -39,8 +41,36 @@ public class BoardController {
 	private final BoardRepository boardRepository;
 	private final HttpSession session;
 	// final 붙이면 초기화 해줘야한다.
+	
+	// 수정하기
+	@PutMapping("/board/{id}")
+	public @ResponseBody CMRespDto<String> update(@PathVariable int id, 
+			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){ //******bindingResult는 dto 다음에 와야한다.
+			//@RequestBody -> json 데이터를 javascript 오브젝으로 변경해준다.
+		
+		User principal = (User) session.getAttribute("principal");
+		Board board = dto.toEntity(principal);
+		board.setId(id); // update의 핵심
+		
+		boardRepository.save(board);
+		return new CMRespDto<String>(1, "업데이트 성공",null);
+		
+	}
 
-	//API(ajax) 요청
+	// 수정하기 페이지 이동
+	@GetMapping("/board/{id}/updateForm")
+	public String boardUpdateForm(@PathVariable int id, Model model) {
+		
+		// 게시글 정보 가지고 가야함.
+		Board boardEntity = boardRepository.findById(id)
+				.orElseThrow(() -> new MyNotFoundException(id+"번의 게시글을 찾을 수 없습니다."));
+		model.addAttribute("boardEntity",boardEntity);
+		
+		return "board/updateForm";
+		
+	}
+
+	// API(ajax) 요청
 	@DeleteMapping("/board/{id}")
 	public @ResponseBody CMRespDto<String> deleteById(@PathVariable int id) {
 
@@ -58,11 +88,11 @@ public class BoardController {
 		}
 
 		try {
-				boardRepository.deleteById(id); // 게시글 id가 없으면 오류 발생 (Empty result data Exception) -> try ~ catch 처리
+			boardRepository.deleteById(id); // 게시글 id가 없으면 오류 발생 (Empty result data Exception) -> try ~ catch 처리
 		} catch (Exception e) {
 			throw new MyAsyncNotFoundException(id + "를 찾을 수 없어서 삭제할 수 없습니다.");
 		}
-		return new CMRespDto<String>(1, "성공",null); // @ResoponseBody : 데이터 리턴
+		return new CMRespDto<String>(1, "성공", null); // @ResoponseBody : 데이터 리턴
 	}
 
 	// queryString, pathVariable => DB where에 걸리는 친구들!!
