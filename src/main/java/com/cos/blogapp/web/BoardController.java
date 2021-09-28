@@ -48,7 +48,31 @@ public class BoardController {
 			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){ //******bindingResult는 dto 다음에 와야한다.
 			//@RequestBody -> json 데이터를 javascript 오브젝으로 변경해준다.
 		
+		//~공통로직 처리~ : aop 관점지향프로그램
+		
+		//유효성검사
+		if (bindingResult.hasErrors()) {
+			Map<String, String> errorMap = new HashMap<>();
+			for (FieldError error : bindingResult.getFieldErrors()) {
+				errorMap.put(error.getField(), error.getDefaultMessage());
+			}
+			throw new MyAsyncNotFoundException(errorMap.toString());
+		}
+		
+		//인증 체크
 		User principal = (User) session.getAttribute("principal");
+		if (principal == null) {
+			throw new MyAsyncNotFoundException("인증이 되지 않았습니다.");
+		}
+		
+		//권한 체크
+		Board boardEntity = boardRepository.findById(id)
+				.orElseThrow(() -> new MyAsyncNotFoundException("해당 게시글을 찾을 수 없습니다."));
+		if (principal.getId() != boardEntity.getUser().getId()) {
+			throw new MyAsyncNotFoundException("해당 게시글을 수정할 권한이 없습니다.");
+		}
+		
+		//~핵심기능~
 		Board board = dto.toEntity(principal);
 		board.setId(id); // update의 핵심
 		
