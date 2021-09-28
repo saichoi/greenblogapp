@@ -60,4 +60,5 @@
              height: 350
         });
   </script>
+  
 <%@ include file="../layout/footer.jsp" %>

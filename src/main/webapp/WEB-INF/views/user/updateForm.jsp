@@ -4,19 +4,50 @@
 <%@ include file="../layout/header.jsp"%>
 
 <div class="container p-4 w-25 bg-light rounded shadow">
-	<h5 style="font-family: 'IBM Plex Sans KR', sans-serif; margin-bottom: 30px;">회원정보</h5>
-	<form>
+	<h5
+		style="font-family: 'IBM Plex Sans KR', sans-serif; margin-bottom: 30px;">회원정보</h5>
+	<form onsubmit="update(event,${sessionScope.principal.id})">
 		<div class="form-group">
-			<input type="text" value="${sessionScope.principal.username}" class="form-control" placeholder="Enter username" required="required" maxlength="20" readonly="readonly">
+			<input type="text" value="${sessionScope.principal.username}"
+				class="form-control" placeholder="Enter username" maxlength="20"
+				readonly="readonly">
 		</div>
 		<div class="form-group">
-			<input type="password" value="${sessionScope.principal.password}" class="form-control"  placeholder="Enter password" required="required" maxlength="20">
+			<input type="email" id="email"
+				value="${sessionScope.principal.email}" class="form-control"
+				placeholder="Enter email">
 		</div>
-		<div class="form-group">
-			<input type="email" value="${sessionScope.principal.email}" class="form-control" placeholder="Enter email">
-		</div>
-		<button type="submit" class="btn btn-primary col-md-4" style="margin-top: 30px;">회원수정</button>
+		<button type="submit" class="btn btn-primary col-md-4"
+			style="margin-top: 30px;">회원수정</button>
 	</form>
 </div>
+
+<script>
+       async function update(event, id){ 
+          event.preventDefault();
+
+          let userUpdateDto = {
+                email: document.querySelector("#email").value,
+          };
+       
+             let response = await fetch("http://localhost:8000/user/"+id, {
+                method: "put",
+                body: JSON.stringify(userUpdateDto), // json 데이터 전송
+                headers: {
+                   "Content-Type": "application/json; charset=utf-8"
+                }
+             });
+             
+             let parseResponse = await response.json();
+             
+             if(parseResponse.code == 1){
+                alert("업데이트 성공");
+                	location.href="/";
+             }else{
+                alert("업데이트 실패 : " + parseResponse.msg);
+             }
+       }
+  
+  </script>
 
 <%@ include file="../layout/footer.jsp"%>
