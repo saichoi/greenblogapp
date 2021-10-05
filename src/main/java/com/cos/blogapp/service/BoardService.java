@@ -59,12 +59,10 @@ public class BoardService {
 			throw new MyAsyncNotFoundException("해당 게시글을 수정할 권한이 없습니다.");
 		}
 
-		// ~핵심기능~
-		Board board = dto.toEntity(principal);
-		board.setId(id); // update의 핵심
-
-		boardRepository.save(board);
-	}
+		// 영속화된 데이터를 변경하면!!
+		boardEntity.setTitle(dto.getTitle());
+		boardEntity.setContent(dto.getContent());
+	} // 트랜젝션 종료(더티체킹) 
 
 	public Board 게시글수정페이지이동(int id, Model model) {
 		// 게시글 정보 가지고 가야함.
