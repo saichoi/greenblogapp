@@ -7,9 +7,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,33 +20,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cos.blogapp.domain.board.Board;
-import com.cos.blogapp.domain.board.BoardRepository;
 import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.handler.ex.MyAsyncNotFoundException;
-import com.cos.blogapp.handler.ex.MyNotFoundException;
+import com.cos.blogapp.service.BoardService;
 import com.cos.blogapp.util.Script;
 import com.cos.blogapp.web.dto.BoardSaveReqDto;
 import com.cos.blogapp.web.dto.CMRespDto;
+import com.cos.blogapp.web.dto.CommentSaveReqDto;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor // final 붙은 필드에 대한 생성자를 만들어준다.
-@Controller // 컴퍼넌트 스캔(스프링) loC
+@RequiredArgsConstructor 
+@Controller 
 public class BoardController {
 
 	// DI : Ioc에 있는거 가져옴
-	private final BoardRepository boardRepository;
+	private final BoardService boardService;
 	private final HttpSession session;
-	// final 붙이면 초기화 해줘야한다.
 	
-	// 수정하기
+	// 댓글달기
+	@PostMapping("/board/{boardId}/comment")
+	public String commentSave(@PathVariable int boardId, CommentSaveReqDto dto) {
+		User principal = (User) session.getAttribute("principal");		
+		boardService.댓글등록(boardId, dto, principal); // -> 디비와 관련된 트랜젝션을 서비스로 이동 
+		return "redirect:/board/"+boardId;  
+	}
+	
+	// 게시글 수정하기
 	@PutMapping("/board/{id}")
 	public @ResponseBody CMRespDto<String> update(@PathVariable int id, 
-			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){ //******bindingResult는 dto 다음에 와야한다.
-			//@RequestBody -> json 데이터를 javascript 오브젝으로 변경해준다.
-		
-		//~공통로직 처리~ : aop 관점지향프로그램
-		
+			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){
+
 		//유효성검사
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errorMap = new HashMap<>();
@@ -65,85 +66,43 @@ public class BoardController {
 			throw new MyAsyncNotFoundException("인증이 되지 않았습니다.");
 		}
 		
-		//권한 체크
-		Board boardEntity = boardRepository.findById(id)
-				.orElseThrow(() -> new MyAsyncNotFoundException("해당 게시글을 찾을 수 없습니다."));
-		if (principal.getId() != boardEntity.getUser().getId()) {
-			throw new MyAsyncNotFoundException("해당 게시글을 수정할 권한이 없습니다.");
-		}
+		boardService.게시글수정(id, principal, dto);
 		
-		//~핵심기능~
-		Board board = dto.toEntity(principal);
-		board.setId(id); // update의 핵심
-		
-		boardRepository.save(board);
 		return new CMRespDto<String>(1, "업데이트 성공",null);
 		
 	}
 
-	// 수정하기 페이지 이동
+	// 게시글 수정하기 페이지 이동
 	@GetMapping("/board/{id}/updateForm")
 	public String boardUpdateForm(@PathVariable int id, Model model) {
 		
-		// 게시글 정보 가지고 가야함.
-		Board boardEntity = boardRepository.findById(id)
-				.orElseThrow(() -> new MyNotFoundException(id+"번의 게시글을 찾을 수 없습니다."));
-		model.addAttribute("boardEntity",boardEntity);
+		model.addAttribute("boardEntity", boardService.게시글수정페이지이동(id, model));
 		
 		return "board/updateForm";
 		
 	}
 
-	// API(ajax) 요청
+	// 게시글 삭제하기 
 	@DeleteMapping("/board/{id}")
 	public @ResponseBody CMRespDto<String> deleteById(@PathVariable int id) {
-
-		// 인증이 된 사람만 접근 가능!!(로그인 된 사람)
 		User principal = (User) session.getAttribute("principal");
-		if (principal == null) {
-			throw new MyAsyncNotFoundException("인증이 되지 않았습니다.");
-		}
-
-		// 권한이 있는 사람 함수 접근 가능(principal.id == {id})
-		Board boardEntity = boardRepository.findById(id)
-				.orElseThrow(() -> new MyAsyncNotFoundException("해당글을 찾을 수 없습니다."));
-		if (principal.getId() != boardEntity.getUser().getId()) {
-			throw new MyAsyncNotFoundException("해당글을 삭제할 권한이 없습니다.");
-		}
-
-		try {
-			boardRepository.deleteById(id); // 게시글 id가 없으면 오류 발생 (Empty result data Exception) -> try ~ catch 처리
-		} catch (Exception e) {
-			throw new MyAsyncNotFoundException(id + "를 찾을 수 없어서 삭제할 수 없습니다.");
-		}
+		
+		boardService.게시글삭제(id, principal);
 		return new CMRespDto<String>(1, "성공", null); // @ResoponseBody : 데이터 리턴
 	}
 
-	// queryString, pathVariable => DB where에 걸리는 친구들!!
-	// 1.컨트롤러 선정 2.Http Method 선정 3.받을 데이터가 있는지!! (body, queryString, pathVariable)
-	// 4.디비에 접근해야하면 Model 접근 orElse Model에 접근할 필요 없다.
-	@GetMapping("/board/{id}") // PathVariable 주소 방식
+	// 게시글 상세보기 
+	@GetMapping("/board/{id}") 
 	public String detail(@PathVariable int id, Model model) {
-		// select * from board where id = :id
-
-		// 1.orElse : 값을 찾으면 Board가 리턴, 못찾으면 (괄호안 내용 리턴)
-		// Board boardEntity = boardRepository.findById(id)
-		// .orElse(new Board(100, "글없어요", "글없어요", null));
-
-		// 2.orElseThrow
-		Board boardEntity = boardRepository.findById(id).orElseThrow(() -> // 람다식 사용할 때 : 함수 한개인지 확인->매개변수 있는지
-																			// 확인->리턴필요한지 확인:<T>를 리턴
-		new MyNotFoundException(id + "를 못 찾았어요."));
-		// 람다식에서 {}는 여러줄 코드를 사용하기 위해 사용 -> 한 줄이라면 중괄호 생략 -> 한줄 무조건 리턴 -> 리턴 생략 -> 세미콜론
-		// 지움
-		model.addAttribute("boardEntity", boardEntity);
+		model.addAttribute("boardEntity", boardService.게시글상세보기(id, model));
 		return "board/detail";
 	}
 
-	// RestFull API 주소 설계 방식
+	// 게시글 등록하기
 	@PostMapping("/board")
 	public @ResponseBody String save(@Valid BoardSaveReqDto dto, BindingResult bindingResult) {
 
+	//공통 로직 
 		User principal = (User) session.getAttribute("principal");
 
 		// 인증 체크
@@ -159,42 +118,22 @@ public class BoardController {
 			return Script.back(errorMap.toString());
 		}
 
-		System.out.println(dto.getTitle());
-		System.out.println(dto.getContent());
-
-//		User user = new User();
-//		user.setId(3);
-//		boardRepository.save(dto.toEntity(user));
-
-		boardRepository.save(dto.toEntity(principal));
+	// 핵심 로직 
+		boardService.게시글등록(principal, dto);
+		
 		return Script.href("/", "글쓰기 성공"); // 데이터를 모델에서 들고 와야 한다.
 	}
 
+	// 게시글 등록하기 페이지 이동하기
 	@GetMapping("/board/saveForm")
 	public String saveForm() {
 		return "/board/saveForm";
 	}
 
+	// 게시글 목록보기 
 	@GetMapping("/board")
-	public String home(Model model, int page) { // Model:request.setAttribute가 하는 기능을 한다.
-
-		// 페이징 하고나면 메인페이지에서 오류남
-		// 방법1 page 타입을 Integer로 바꿔서...
-//		if(page == null) {
-//			System.out.println("page값이 null입니다.");
-//			page = 0;
-//		}
-
-		// 페이징
-		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by(Direction.DESC, "id"));
-
-		// boardsEntity: 퍼시스턴트 오브젝트: 영속화된 오브젝트 -> 오브젝트 사용시 셀렉트(레이지 로딩)
-		Page<Board> boardsEntity = boardRepository.findAll(pageRequest); // Sort.by(Sort.Direction.DESC, "id")
-																			// //BoardRepository에서 Board 적어둬서 컴퓨터가 매핑
-																			// 타입을 이미 알고 있다.
-		model.addAttribute("boardsEntity", boardsEntity);
-		// System.out.println(boardsEntity.get(0).getUser().getUsername());
-		// //boardsEntity.get(0).getUser() => 이 단계에서 select(지연로딩)
+	public String home(Model model, int page) {
+		model.addAttribute("boardsEntity", boardService.게시글목록보기(page));
 		return "board/list";
 	}
 
