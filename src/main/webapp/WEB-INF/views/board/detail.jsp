@@ -6,9 +6,9 @@
 <div class="container">
 	<!-- 내 글이면 (권한이 있으면 ) 수정과 삭제 버튼 보이게 if 사용 가눙 -->
 	<c:if test="${sessionScope.principal.id == boardEntity.user.id}">
- 			<a href="/board/${boardEntity.id}/updateForm" class="btn btn-warning">수정</a>
- 			<button class="btn btn-danger" onclick="deleteById(${boardEntity.id})">삭제</button>
- 		</c:if>
+		<a href="/board/${boardEntity.id}/updateForm" class="btn btn-warning">수정</a>
+		<button class="btn btn-danger" onclick="deleteById(${boardEntity.id})">삭제</button>
+	</c:if>
 
 	<script>
          	async function deleteById(id){ // board.id 자바스크립트는 타입 필요 없다.
@@ -51,7 +51,7 @@
 	<hr />
 
 	<div class="card">
-	<!-- 댓글 쓰기 시작 -->
+		<!-- 댓글 쓰기 시작 -->
 		<form action="/board/${boardEntity.id}/comment" method="post">
 			<div class="card-body">
 				<textarea name="content" class="form-control" rows="1"></textarea>
@@ -69,14 +69,19 @@
 			<b>댓글 리스트</b>
 		</div>
 		<ul id="reply-box" class="list-group">
-			<li id="reply-1"
-				class="list-group-item d-flex justify-content-between">
-				<div>댓글입니다</div>
-				<div class="d-flex">
-					<div class="font-italic">작성자 : 홍길동 &nbsp;</div>
-					<button class="badge">삭제</button>
-				</div>
-			</li>
+			<!-- 댓글 시작 -->
+			<c:forEach var="comment" items="${boardEntity.comments}">
+				<li id="reply-${comment.id }"
+					class="list-group-item ds-flex justify-content-between">
+					<!-- LAZY loading 일어남 :  사용직전 -->
+					<div>${comment.content}</div>
+					<div class="d-flex">
+						<div class="font-italic">작성자 : ${commment.user.username} &nbsp;</div>
+						<button class="badge">삭제</button>
+					</div>
+				</li>
+			</c:forEach>
+			<!-- 댓글 끝 -->
 		</ul>
 	</div>
 	<br />

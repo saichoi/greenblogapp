@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class UserControllertest {
+public class UserControllerTest {
 	
 	@GetMapping("/test/join")
 	public @ResponseBody String testJoin() {

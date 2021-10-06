@@ -94,8 +94,9 @@ public class BoardController {
 	// 게시글 상세보기 
 	@GetMapping("/board/{id}") 
 	public String detail(@PathVariable int id, Model model) {
+		// Board객체에 존재하는 것(Board(o),User(o),List<Comment>(x : LAZY))
 		model.addAttribute("boardEntity", boardService.게시글상세보기(id, model));
-		return "board/detail";
+		return "board/detail"; // ViewResolver
 	}
 
 	// 게시글 등록하기
