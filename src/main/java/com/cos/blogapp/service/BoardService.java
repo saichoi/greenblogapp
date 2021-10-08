@@ -26,27 +26,11 @@ public class BoardService {
 
 	// 생성자 주입(DI)
 	private final BoardRepository boardRepository;
-	private final CommentRepository commentRepository;
 
 	// 트랜젝션 어노테이션 : 트랜젝션 시작하는 것
 	// rollbackFor : 함수 내부에 하나의 write라도 실패하면 전체를 rollback하는 것
 	// 주의 :RuntimeException을 던저야 동작한다. 
-	@Transactional(rollbackFor = MyNotFoundException.class) // 트랜젝션에서 하나라도 실패하면 전부 롤백 됨
-	public void 댓글등록(int boardId, CommentSaveReqDto dto, User principal) {
-
-		// 댓글 등록하는 서비스(트랜젝션)
-		Board boardEntity = boardRepository.findById(boardId)
-				.orElseThrow(() -> new MyNotFoundException("해당 게시글을 찾을 수 없습니다."));
-
-		Comment comment = new Comment();
-
-		comment.setContent(dto.getContent());
-		comment.setUser(principal);
-		comment.setBoard(boardEntity);
-
-		commentRepository.save(comment);
-	}
-
+	
 	@Transactional(rollbackFor = MyAsyncNotFoundException.class) // 트랜젝션에서 하나라도 실패하면 전부 롤백 됨
 	public void 게시글수정(int id, User principal, BoardSaveReqDto dto) {
 
