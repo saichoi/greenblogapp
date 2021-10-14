@@ -5,7 +5,7 @@
 
 <div class="container p-4 w-70 rounded shadow">
 	<h5 style="font-family: 'IBM Plex Sans KR', sans-serif; margin-bottom: 30px;">글쓰기</h5>
-	<form action="/board" method="post">
+	<form action="/api/board" method="post">
 		<div class="form-group">
 			<input type="text" name="title" class="form-control" placeholder="Enter title">
 		</div>

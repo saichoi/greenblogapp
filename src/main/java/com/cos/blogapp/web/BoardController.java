@@ -40,20 +40,16 @@ public class BoardController {
 	private final HttpSession session;
 	
 	// 댓글달기
-	@PostMapping("/board/{boardId}/comment")
+	@PostMapping("/api/board/{boardId}/comment")
 	public String commentSave(@PathVariable int boardId, CommentSaveReqDto dto) {
 		User principal = (User) session.getAttribute("principal");
-		
-		if (principal == null) {
-			throw new MyNotFoundException("인증이 되지 않았습니다.");
-		}
 		
 		commentService.댓글등록(boardId, dto, principal); // -> 디비와 관련된 트랜젝션을 서비스로 이동 
 		return "redirect:/board/"+boardId;  
 	}
 	
 	// 게시글 수정하기
-	@PutMapping("/board/{id}")
+	@PutMapping("/api/board/{id}")
 	public @ResponseBody CMRespDto<String> update(@PathVariable int id, 
 			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){
 
@@ -66,11 +62,7 @@ public class BoardController {
 			throw new MyAsyncNotFoundException(errorMap.toString());
 		}
 		
-		//인증 체크
 		User principal = (User) session.getAttribute("principal");
-		if (principal == null) {
-			throw new MyAsyncNotFoundException("인증이 되지 않았습니다.");
-		}
 		
 		boardService.게시글수정(id, principal, dto);
 		
@@ -79,7 +71,7 @@ public class BoardController {
 	}
 
 	// 게시글 수정하기 페이지 이동
-	@GetMapping("/board/{id}/updateForm")
+	@GetMapping("/api/board/{id}/updateForm")
 	public String boardUpdateForm(@PathVariable int id, Model model) {
 		
 		model.addAttribute("boardEntity", boardService.게시글수정페이지이동(id, model));
@@ -89,11 +81,12 @@ public class BoardController {
 	}
 
 	// 게시글 삭제하기 
-	@DeleteMapping("/board/{id}")
+	@DeleteMapping("/api/board/{id}")
 	public @ResponseBody CMRespDto<String> deleteById(@PathVariable int id) {
 		User principal = (User) session.getAttribute("principal");
 		
 		boardService.게시글삭제(id, principal);
+		
 		return new CMRespDto<String>(1, "성공", null); // @ResoponseBody : 데이터 리턴
 	}
 
@@ -106,16 +99,10 @@ public class BoardController {
 	}
 
 	// 게시글 등록하기
-	@PostMapping("/board")
+	@PostMapping("/api/board")
 	public @ResponseBody String save(@Valid BoardSaveReqDto dto, BindingResult bindingResult) {
 
-	//공통 로직 
 		User principal = (User) session.getAttribute("principal");
-
-		// 인증 체크
-		if (principal == null) {
-			return Script.href("/loginForm", "잘못된 접근입니다.");
-		}
 
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errorMap = new HashMap<>();

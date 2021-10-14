@@ -13,7 +13,7 @@
 	<script>
          	async function deleteById(id){ // board.id 자바스크립트는 타입 필요 없다.
          		// 1.비동기 함수 호출 -> 비동기 잘 처리하는 방법??????		
-         		let response = await fetch("http://localhost:8000/board/"+id, { // fetch : http 요청 함수 (axios, ajax...) 
+         		let response = await fetch("http://localhost:8080/api/board/"+id, { // fetch : http 요청 함수 (axios, ajax...) 
 									         		// http://localhost:8000 -> 생략가능
          			method : "DELETE"
          		}); //약속 - 어음(0.5s)
@@ -52,7 +52,7 @@
 
 	<div class="card">
 		<!-- 댓글 쓰기 시작 -->
-		<form action="/board/${boardEntity.id}/comment" method="post" >
+		<form action="/api/board/${boardEntity.id}/comment" method="post" >
 			<div class="card-body">
 				<textarea name="content" class="form-control" rows="1"  id="ta-content"></textarea>
 			</div>

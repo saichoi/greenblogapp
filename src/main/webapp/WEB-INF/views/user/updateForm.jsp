@@ -30,7 +30,7 @@
                 email: document.querySelector("#email").value,
           };
        
-             let response = await fetch("http://localhost:8000/user/"+id, {
+             let response = await fetch("http://localhost:8080/api/user/"+id, {
                 method: "put",
                 body: JSON.stringify(userUpdateDto), // json 데이터 전송
                 headers: {

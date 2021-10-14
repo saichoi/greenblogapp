@@ -39,7 +39,7 @@ public class UserController {
 	private final HttpSession session;
 
 	// 회원정보 수정 
-	@PutMapping("/user/{id}")
+	@PutMapping("/api/user/{id}")
 	public @ResponseBody CMRespDto<String> update(@PathVariable int id, @Valid @RequestBody UserUpdateDto dto, BindingResult bindingResult) {
 
 		//유효성검사
@@ -51,11 +51,7 @@ public class UserController {
 			throw new MyAsyncNotFoundException(errorMap.toString());
 		}
 		
-		//인증 체크
 		User principal = (User) session.getAttribute("principal");
-		if (principal == null) {
-			throw new MyAsyncNotFoundException("인증이 되지 않았습니다.");
-		}
 		
 		//권한 체크
 		if (principal.getId() != id) {
@@ -74,7 +70,7 @@ public class UserController {
 	}
 
 	// 회원정보 보기 
-	@GetMapping("/user/{id}")
+	@GetMapping("/api/user/{id}")
 	public String userInfo(@PathVariable int id) {
 		return "user/updateForm";
 	}
