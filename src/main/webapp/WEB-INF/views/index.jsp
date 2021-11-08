@@ -3,7 +3,7 @@
 
 <!-- 방법2 -->
 <script>
-	location.href="/baord";
+	location.href="/board";
 </script>
 
 <!-- 방법1 -->

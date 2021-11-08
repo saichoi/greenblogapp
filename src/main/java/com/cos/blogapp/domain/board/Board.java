@@ -17,7 +17,6 @@ import javax.persistence.Table;
 
 import com.cos.blogapp.domain.comment.Comment;
 import com.cos.blogapp.domain.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -53,5 +52,5 @@ public class Board {
 	@OneToMany(mappedBy =  "board", fetch = FetchType.LAZY)
 	@OrderBy("id desc")
 	private List<Comment> comments;
-
+	
 }

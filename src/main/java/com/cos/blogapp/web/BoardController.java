@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.handler.ex.MyAsyncNotFoundException;
-import com.cos.blogapp.handler.ex.MyNotFoundException;
 import com.cos.blogapp.service.BoardService;
 import com.cos.blogapp.service.CommentService;
 import com.cos.blogapp.util.Script;
@@ -52,7 +51,7 @@ public class BoardController {
 	@PutMapping("/api/board/{id}")
 	public @ResponseBody CMRespDto<String> update(@PathVariable int id, 
 			@RequestBody @Valid BoardSaveReqDto dto, BindingResult bindingResult){
-
+		System.out.println("실행됨??");
 		//유효성검사
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errorMap = new HashMap<>();

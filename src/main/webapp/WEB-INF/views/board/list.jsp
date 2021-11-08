@@ -3,7 +3,6 @@
 
 <%@ include file="../layout/header.jsp"%>
 
-
 <div class="container">
 
 	<!-- var는 pageScope에 저장 -->

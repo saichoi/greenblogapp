@@ -1,7 +1,5 @@
 package com.cos.blogapp.service;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
