@@ -5,6 +5,8 @@
 
 <div class="container">
 
+	<p>전체 게시글 : ${boardsEntity.totalElements}</p>
+
 	<!-- var는 pageScope에 저장 -->
 	<c:forEach var="board" items="${boardsEntity.content}">
 		<!-- 카드 글 시작 -->
@@ -35,11 +37,16 @@ ${boardsEntity.first}<br/> --%>
 			</c:otherwise>
 		</c:choose>
 
+		<c:forEach begin="${startPage}" end="${endPage}" var="idx">
+			 	<li class="page-item"><a class="page-link" href="/board?page=${idx-1}">${idx}</a></li>
+		</c:forEach>
+			 	
 		<c:choose>
 			<c:when test="${boardsEntity.last}">
 				<li class="page-item disabled"><a class="page-link"
 					href="/board?page=${param.page + 1}">Next</a></li>
 			</c:when>
+			
 			<c:otherwise>
 				<li class="page-item"><a class="page-link"
 					href="/board?page=${param.page + 1}">Next</a></li>

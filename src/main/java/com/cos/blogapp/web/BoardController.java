@@ -6,6 +6,10 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cos.blogapp.domain.board.Board;
+import com.cos.blogapp.domain.board.BoardRepository;
 import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.handler.ex.MyAsyncNotFoundException;
 import com.cos.blogapp.service.BoardService;
@@ -37,6 +43,7 @@ public class BoardController {
 	private final BoardService boardService;
 	private final CommentService commentService;
 	private final HttpSession session;
+	private final BoardRepository boardRepository;
 	
 	// 댓글달기
 	@PostMapping("/api/board/{boardId}/comment")
@@ -126,7 +133,15 @@ public class BoardController {
 	// 게시글 목록보기 
 	@GetMapping("/board")
 	public String home(Model model, int page) {
-		model.addAttribute("boardsEntity", boardService.게시글목록보기(page));
+		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by(Direction.DESC, "id"));
+		Page<Board> boardsEntity = boardRepository.findAll(pageRequest);
+		int startPage = Math.max(1, boardsEntity.getPageable().getPageNumber() - 4);
+		int endPage = Math.min(boardsEntity.getTotalPages(), boardsEntity.getPageable().getPageNumber() + 4);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+		model.addAttribute("boardsEntity", boardsEntity);
+		System.out.println(startPage);
+		System.out.println(endPage);
 		return "board/list";
 	}
 

@@ -84,7 +84,6 @@ public class BoardService {
 	}
 
 	public Page<Board> 게시글목록보기(int page) {
-
 		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by(Direction.DESC, "id"));
 		Page<Board> boardsEntity = boardRepository.findAll(pageRequest); 
 		return boardsEntity;
