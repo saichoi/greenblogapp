@@ -8,8 +8,10 @@ import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cos.blogapp.domain.board.Board;
@@ -132,17 +135,18 @@ public class BoardController {
 
 	// 게시글 목록보기 
 	@GetMapping("/board")
-	public String home(Model model, int page) {
-		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by(Direction.DESC, "id"));
-		Page<Board> boardsEntity = boardRepository.findAll(pageRequest);
+	public String home(Model model, 
+			@PageableDefault(page = 0, size = 3, sort = "id", direction = Sort.Direction.DESC) Pageable page,
+			@RequestParam(required = false, defaultValue = "") String searchText) {
+		Page<Board> boardsEntity = boardRepository.findByTitleOrContent(searchText, page);
 		int startPage = Math.max(1, boardsEntity.getPageable().getPageNumber() - 4);
 		int endPage = Math.min(boardsEntity.getTotalPages(), boardsEntity.getPageable().getPageNumber() + 4);
+		int nowPage = boardsEntity.getPageable().getPageNumber() + 1;
 		model.addAttribute("startPage", startPage);
 		model.addAttribute("endPage", endPage);
-		model.addAttribute("boardsEntity", boardsEntity);
-		System.out.println(startPage);
-		System.out.println(endPage);
+		model.addAttribute("nowPage", nowPage);
+		model.addAttribute("boardsEntity", boardService.게시글목록보기(page, searchText));
 		return "board/list";
 	}
-
+	
 }

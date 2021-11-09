@@ -2,6 +2,7 @@ package com.cos.blogapp.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -10,13 +11,10 @@ import org.springframework.ui.Model;
 
 import com.cos.blogapp.domain.board.Board;
 import com.cos.blogapp.domain.board.BoardRepository;
-import com.cos.blogapp.domain.comment.Comment;
-import com.cos.blogapp.domain.comment.CommentRepository;
 import com.cos.blogapp.domain.user.User;
 import com.cos.blogapp.handler.ex.MyAsyncNotFoundException;
 import com.cos.blogapp.handler.ex.MyNotFoundException;
 import com.cos.blogapp.web.dto.BoardSaveReqDto;
-import com.cos.blogapp.web.dto.CommentSaveReqDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -83,10 +81,8 @@ public class BoardService {
 		boardRepository.save(dto.toEntity(principal));
 	}
 
-	public Page<Board> 게시글목록보기(int page) {
-		PageRequest pageRequest = PageRequest.of(page, 3, Sort.by(Direction.DESC, "id"));
-		Page<Board> boardsEntity = boardRepository.findAll(pageRequest); 
-		return boardsEntity;
+	public Page<Board> 게시글목록보기(Pageable page, String searchText) {
+		return boardRepository.findByTitleOrContent(searchText, page);
 	}
 
 } // end of BoardService

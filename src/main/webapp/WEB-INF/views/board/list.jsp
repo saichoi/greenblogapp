@@ -7,6 +7,17 @@
 
 	<p>전체 게시글 : ${boardsEntity.totalElements}</p>
 
+	<!-- 검색창 시작 -->
+	<form class="row g-3 d-fex justify-content-end" >
+		<div class="col-auto">
+			<input type="text" class="form-control" id="searchText" name="searchText"
+				value="${params.searchText}">
+		</div>
+		<div class="col-auto">
+			<button type="submit" class="btn btn-primary mb-3">검색</button>
+		</div>
+	</form>
+
 	<!-- var는 pageScope에 저장 -->
 	<c:forEach var="board" items="${boardsEntity.content}">
 		<!-- 카드 글 시작 -->
@@ -21,39 +32,46 @@
 		<!-- 카드 글 끝 -->
 	</c:forEach>
 
-	<%-- ${boardsEntity.last}<br/>
-${boardsEntity.first}<br/> --%>
-
 	<!-- disabled -->
 	<ul class="pagination d-flex justify-content-center">
 		<c:choose>
 			<c:when test="${boardsEntity.first}">
 				<li class="page-item disabled"><a class="page-link"
-					href="/board?page=${boardsEntity.number - 1}">Prev</a></li>
+					href="/board?page=${boardsEntity.number - 1}&searchText=${param.searchText}">Prev</a></li>
 			</c:when>
 			<c:otherwise>
 				<li class="page-item"><a class="page-link"
-					href="/board?page=${boardsEntity.number - 1}">Prev</a></li>
+					href="/board?page=${boardsEntity.number - 1}&searchText=${param.searchText}">Prev</a></li>
 			</c:otherwise>
 		</c:choose>
 
+
 		<c:forEach begin="${startPage}" end="${endPage}" var="idx">
-			 	<li class="page-item"><a class="page-link" href="/board?page=${idx-1}">${idx}</a></li>
+			<c:choose>
+				<c:when test="${idx eq nowPage}">
+					<li class="page-item disabled"><a
+						class="page-link page-active" href="/board?page=${idx-1}"&searchText=${param.searchText}>${idx}</a></li>
+				</c:when>
+				<c:otherwise>
+					<li class="page-item"><a class="page-link"
+						href="/board?page=${idx-1}&searchText=${param.searchText}">${idx}</a></li>
+				</c:otherwise>
+			</c:choose>
 		</c:forEach>
-			 	
+
 		<c:choose>
 			<c:when test="${boardsEntity.last}">
 				<li class="page-item disabled"><a class="page-link"
-					href="/board?page=${param.page + 1}">Next</a></li>
+					href="/board?page=${param.page + 1}&searchText=${param.searchText}">Next</a></li>
 			</c:when>
-			
+
 			<c:otherwise>
 				<li class="page-item"><a class="page-link"
-					href="/board?page=${param.page + 1}">Next</a></li>
+					href="/board?page=${param.page + 1}&searchText=${param.searchText}">Next</a></li>
 			</c:otherwise>
 		</c:choose>
 	</ul>
-	
+
 </div>
 
 <%@ include file="../layout/footer.jsp"%>
