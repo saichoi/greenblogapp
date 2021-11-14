@@ -1,16 +1,17 @@
 package com.cos.blogapp.web;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,6 +140,19 @@ public class BoardController {
 			@PageableDefault(page = 0, size = 3, sort = "id", direction = Sort.Direction.DESC) Pageable page,
 			@RequestParam(required = false, defaultValue = "") String searchText) {
 		Page<Board> boardsEntity = boardRepository.findByTitleOrContent(searchText, page);
+		Iterator<Board> it = boardsEntity.iterator();
+
+		while(it.hasNext()) {
+			Board boardEntity = it.next();
+
+			//Jsoup를 이용해서 첫번째 img의 src의 값을 팡싱한 후 값을 저장
+			Document doc = Jsoup.parse(boardEntity.getContent());
+			if(doc.selectFirst("img") != null) {
+				String src = doc.selectFirst("img").attr("src");
+				boardEntity.setContent(src);
+			}
+		}
+		
 		int startPage = Math.max(1, boardsEntity.getPageable().getPageNumber() - 4);
 		int endPage = Math.min(boardsEntity.getTotalPages(), boardsEntity.getPageable().getPageNumber() + 4);
 		int nowPage = boardsEntity.getPageable().getPageNumber() + 1;
